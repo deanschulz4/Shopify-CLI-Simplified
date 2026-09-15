@@ -91,6 +91,32 @@ Add `.sshop.json` to each theme project's `.gitignore` if it contains personal
 store mappings. This package excludes local configuration and legacy source
 from its distributable archive.
 
+## Select a store once, then omit the abbreviation
+
+Run `si <store_abr>` to select/check your store in Shopify CLI (complete login if
+prompted). After it succeeds, `<store_abr>` is optional on subsequent theme
+commands. Replace the placeholder, including its angle brackets, with an alias.
+
+```sh
+si demo
+sl
+sd "My Theme"
+sp "My Theme"
+sp -p
+sp -d
+si -d -j
+```
+
+Shopify remembers the selected store until another store is specified; this is
+not a permanent per-project binding. Use `si` to check the current target when
+switching projects. An explicit store or a configured `defaultStore` takes
+precedence over Shopify's remembered store. `si` does not change `defaultStore`;
+clear it or set it to the intended store if you want this remembered-store workflow.
+`si --dry-run` does not select a store. `sinit` creates our config file; it is not
+Shopify store initialization.
+
+This follows Shopify's [connecting-to-a-store behavior](https://shopify.dev/docs/storefronts/themes/tools/cli#connecting-to-a-store).
+
 ## Theme commands
 
 | Command | Shortcut | Behavior |
@@ -110,7 +136,7 @@ Short names also work directly: `sshop sd demo "My Theme"`.
 ```sh
 sshop dev sandbox "My Theme"
 sshop pull demo "My Theme" -p
-sshop pull demo --development
+sshop pull demo -d
 sshop dev --store new-store --theme "Theme with spaces"
 sshop dev sandbox -p 9293
 sshop list demo -j
@@ -176,6 +202,20 @@ The longer `sd <store_abr> -- --port 9293` form also remains supported.
 Use `sl <store_abr> -j` or `si <store_abr> -j` for JSON output. `--json` is also
 accepted directly; the original `-- --json` form remains supported. This controls
 output formatting, whereas `sp <store_abr> -p` selects which files to pull.
+
+### Short flags
+
+| Short flag | Long flag | Applies to | Example |
+| --- | --- | --- | --- |
+| `-g` | `--global` | `sinit`, `sstores add/remove`, `simport` | `sstores add demo example-store -g` |
+| `-d` | `--development` | `sp`, `spl`, `spa`, `si` | `sp -d` or `si -d -j` |
+| `-p PORT` | `--port PORT` | `sd` | `sd -p 9293` |
+| `-p` | `--json-only` | Pull commands | `sp -p` |
+| `-j` | `--json` | `sl`, `si` | `sl -j` |
+
+Long flags remain supported. Put these flags before the `--` passthrough separator.
+Store abbreviations are required for alias creation/removal, even when a Shopify
+store is already selected.
 
 ### macOS / Bash / Zsh
 

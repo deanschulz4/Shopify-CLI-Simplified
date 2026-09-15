@@ -30,8 +30,12 @@ Usage: sshop [--config FILE] COMMAND [arguments]
 Options: --store/-s STORE, --theme/-t THEME, --dry-run
 Dev options: --port/-p PORT (example: sd demo -p 9293)
 List/info options: --json/-j (example: sl demo -j)
-Pull options: --live, --development, --json-only/-p
+Pull options: --live, --development/-d, --json-only/-p
+Info options: --development/-d
+Config writes: --global/-g (init, stores add/remove, import)
 Additional Shopify flags go after -- (example: -- --port 9293).
+Select the current store with si STORE; then omit STORE on later theme commands.
+A configured defaultStore overrides the remembered Shopify store. Use si to check.
 Use explicit --store for an unmapped store prefix with no theme.
 Pull defaults to the live theme. Dev without a theme uses a development theme.
 Config order: ~/.sshop.json, nearest .sshop.json; --config or SSHOP_CONFIG isolates.
@@ -58,10 +62,11 @@ export async function main(argv) {
   }
   const mutation = command === 'init' || command === 'import' || (command === 'stores' && ['add', 'remove'].includes(args[0]));
   if (mutation) {
-    const global = args.includes('--global');
+    const normalized = args.map(arg => arg === '-g' ? '--global' : arg);
+    const global = normalized.includes('--global');
     if (global && explicit) throw new Error('Choose --global or --config, not both.');
-    if (args.filter(arg => arg === '--global').length > 1) throw new Error('Repeated --global option.');
-    const values = args.filter(arg => arg !== '--global');
+    if (normalized.filter(arg => arg === '--global').length > 1) throw new Error('Repeated --global option.');
+    const values = normalized.filter(arg => arg !== '--global');
     const file = explicit ? path.resolve(explicit) : path.join(global ? os.homedir() : process.cwd(), filename);
     if (command === 'init') {
       if (values.length) throw new Error('Usage: sshop init [--global]');

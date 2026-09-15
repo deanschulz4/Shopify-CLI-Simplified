@@ -27,9 +27,9 @@ export function buildCommand(name, input, config) {
       continue;
     }
     if (arg === '-p' || arg === '--json-only') { json = true; continue; }
-    if (arg === '--live' || arg === '--development') {
+    if (arg === '--live' || arg === '--development' || arg === '-d') {
       if (selector) throw new Error('Choose only one of --live or --development.');
-      selector = arg; continue;
+      selector = arg === '-d' ? '--development' : arg; continue;
     }
     if (['--store', '-s', '--theme', '-t'].includes(arg)) {
       const value = args[++i];
@@ -59,7 +59,7 @@ export function buildCommand(name, input, config) {
     throw new Error(`${command} does not accept store, theme, or pull options.`);
   }
   if (json && !pull) throw new Error('--json-only applies only to pull.');
-  if (selector && !pull) throw new Error('--live and --development apply only to pull.');
+  if (selector && !pull && !(command === 'info' && selector === '--development')) throw new Error('--live applies only to pull; --development/-d applies to pull and info.');
   if (theme && selector) throw new Error('Use either --theme or a theme selector, not both.');
   if (theme && !thematic && command !== 'info') throw new Error(`${command} does not accept a theme.`);
   store ??= config.defaultStore;
@@ -71,6 +71,7 @@ export function buildCommand(name, input, config) {
     if (command !== 'pull-all' && config.defaults.nodelete !== false) output.push('--nodelete');
     if (json) output.push('--only', 'templates/*.json', '--only', 'config/*.json');
   }
+  if (command === 'info' && selector) output.push(selector);
   if (command === 'dev' && config.defaults.themeEditorSync !== false) output.push('--theme-editor-sync');
   if (port !== undefined) {
     if (extra.some(arg => arg === '--port' || arg.startsWith('--port='))) throw new Error('Port specified more than once.');

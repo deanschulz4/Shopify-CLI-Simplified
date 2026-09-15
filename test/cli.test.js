@@ -204,3 +204,33 @@ test('shell setup via eval replaces existing aliases before defining functions',
     assert.equal(result.stdout, 'demo\nTheme Name\n');
   }
 });
+
+
+test('development shorthand supports pull and info, and store omission preserves Shopify context', () => {
+  for (const cmd of ['sp', 'spl', 'spa', 'si']) {
+    assert.deepEqual(build(cmd, ['-d']), build(cmd, ['--development']));
+    assert.ok(build(cmd, ['-d']).includes('--development'));
+    assert.ok(!build(cmd, ['-d']).includes('--store'));
+  }
+  assert.deepEqual(build('si', ['-d', '-j']), ['theme', 'info', '--development', '--json']);
+  assert.deepEqual(build('sd', ['My Theme']), ['theme', 'dev', '--theme', 'My Theme', '--theme-editor-sync']);
+  assert.throws(() => build('sp', ['-d', '--live']), /only one/);
+  assert.throws(() => build('sp', ['-d', '--development']), /only one/);
+  assert.throws(() => build('si', ['-d', '-t', '123']), /either/);
+  assert.throws(() => build('sd', ['-d']), /applies/);
+});
+
+test('global shorthand writes only the selected personal configuration', t => {
+  const home = temporary(t), cwd = path.join(home, 'project');
+  fs.mkdirSync(cwd);
+  const run = args => spawnSync(process.execPath, [path.join(root, 'bin/sshop.js'), ...args], { cwd, encoding: 'utf8', env: { ...process.env, HOME: home, USERPROFILE: home, SSHOP_CONFIG: '' } });
+  assert.equal(run(['init', '-g']).status, 0);
+  assert.equal(run(['stores', 'add', 'demo', 'example-store', '-g']).status, 0);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(home, '.sshop.json'))).stores.demo, 'example-store.myshopify.com');
+  assert.equal(fs.existsSync(path.join(cwd, '.sshop.json')), false);
+  fs.writeFileSync(path.join(cwd, 'legacy.sh'), "map_store() {\n other) printf '%s' 'other-shop' ;;\n}\n");
+  assert.equal(run(['import', 'legacy.sh', '-g']).status, 0);
+  assert.equal(run(['stores', 'remove', 'other', '-g']).status, 0);
+  assert.equal(run(['init', '-g', '--global']).status, 1);
+  assert.equal(run(['--config', 'custom.json', 'init', '-g']).status, 1);
+});
