@@ -1,3 +1,9 @@
+# Release 0.1.1
+
+Documentation update: simpler setup instructions, shorter command descriptions,
+and a downloadable one-page PDF cheat sheet linked from the README.
+CLI behavior is unchanged. The PDF is hosted in the GitHub repository.
+
 # Release 0.1.0
 
 Initial release: configurable store aliases, personal/project JSON configuration,
