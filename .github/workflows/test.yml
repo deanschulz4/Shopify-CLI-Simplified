@@ -1,5 +1,7 @@
 name: Test
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
 jobs:
   test:
     strategy:
@@ -12,9 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      - run: npm run check
-      - run: npm test
-      - run: npm pack --dry-run
+      - run: npm run release:check
       - name: Install archive and verify native Shopify launch
         shell: bash
         run: |

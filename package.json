@@ -4,7 +4,7 @@
   "private": true,
   "description": "Configurable store aliases and shortcuts for Shopify theme development",
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -31,17 +31,31 @@
     "shell/",
     "examples/",
     "docs/",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "test": "node --test",
     "check": "node --check bin/sshop.js && node --check src/cli.js && node --check src/config.js && node --check src/commands.js",
-    "prepack": "npm run check && npm test"
+    "prepack": "npm run check && npm test",
+    "release:check": "npm run check && npm test && node scripts/check-package.js"
   },
   "keywords": [
     "shopify",
     "cli",
     "themes",
     "aliases"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deanschulz4/Shopify-CLI-Simplified.git"
+  },
+  "homepage": "https://github.com/deanschulz4/Shopify-CLI-Simplified#readme",
+  "bugs": {
+    "url": "https://github.com/deanschulz4/Shopify-CLI-Simplified/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

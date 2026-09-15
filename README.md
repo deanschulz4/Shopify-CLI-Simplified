@@ -4,10 +4,11 @@ Short Shopify theme commands with store aliases you configure in a JSON dotfile.
 Installing the package provides **`sd`, `sp`, `sl`, `si`, `spl`, `spa`, `sc`, `sf`,
 and `lo` directly**. The `sshop` command remains available for compatibility.
 
-This is a working local **0.1.0 prototype**, with no runtime dependencies.
-The npm name is provisional and the package is not published. Release is disabled
-with `private: true` until the package name, repository and open-source license
-are chosen. See [release preparation](docs/RELEASING.md).
+This is the **0.1.0 release candidate**, licensed under MIT, with no runtime
+dependencies. Source: [deanschulz4/Shopify-CLI-Simplified](https://github.com/deanschulz4/Shopify-CLI-Simplified).
+
+The npm package is not published yet. Publication remains disabled until the
+final release checks are complete. See [release preparation](docs/RELEASING.md).
 
 ## Install locally
 
@@ -212,10 +213,11 @@ Personal config on Windows is `%USERPROFILE%\.sshop.json`. Shopify CLI must be
 installed globally with npm. In WSL, install Node and both CLIs inside WSL and
 follow the Bash instructions.
 
-**Verification:** automated tests and installed command checks run locally on
-macOS. Windows-specific launch logic is exercised on macOS; native Windows and
-PowerShell verification is configured in CI but has not run here. Live Shopify
-login/pull/dev workflows remain untested on both platforms.
+**Verification:** the [initial CI run](https://github.com/deanschulz4/Shopify-CLI-Simplified/actions/runs/34994515508)
+passed the Node 22/24 matrix on macOS, Linux, and Windows, including installed
+commands, real Shopify CLI help invocation, and Windows PowerShell shortcuts.
+Each subsequent change must pass its own CI run. Live Shopify login/pull/dev
+workflows remain a separate pre-release check.
 
 ## Migrate the original file
 
@@ -239,15 +241,14 @@ are also not exported. `clis` is still the ordinary Shopify installation command
 ## Development and verification
 
 ```sh
-npm run check
-npm test
+npm run release:check
 npm pack
 ```
 
 Tests cover config resolution, migration, argument handling, shell forwarding,
 and subprocess exit codes using a fake Shopify executable. They do not contact
-stores. The CI workflow checks Node 22/24 on macOS, Linux, and Windows; that matrix
-must run in the future repository before claiming those platforms verified.
+stores. The CI workflow checks Node 22/24 on macOS, Linux, and Windows and runs
+`npm run release:check` to inspect and install the actual npm archive.
 Native Windows dispatch supports the global npm installation of Shopify CLI.
 
 Shopify command behavior follows the official [theme pull](https://shopify.dev/docs/api/shopify-cli/theme/theme-pull)
@@ -261,3 +262,7 @@ npm uninstall -g simplified-shopify-cli
 
 Remove the optional shell startup line and restart your shell. Config files stay
 in place for reuse; remove them yourself when no longer needed.
+
+## License
+
+[MIT](LICENSE). The copyright attribution is public; personal store configuration is excluded from the npm package.

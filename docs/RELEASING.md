@@ -1,40 +1,52 @@
-# Release preparation
+# Release 0.1.0
 
-The package currently installs from a local directory or tarball. It is not
-published, its provisional npm name has not been reserved, and no open-source
-license has been selected. `private: true` prevents accidental npm publication.
+## Prepared
 
-## Before the first public release
+- Package: `simplified-shopify-cli` (npm lookup returned 404 on 2026-09-15;
+  this does not reserve the name or guarantee that npm will accept it).
+- License: MIT, matching the repository LICENSE.
+- Repository: https://github.com/deanschulz4/Shopify-CLI-Simplified
+- Public npm registry/access configured. `private: true` still blocks publication.
+- Initial Node 22/24 CI matrix passed on macOS, Linux, and Windows, including
+  native PowerShell shortcuts. New changes require their own passing run.
+- `npm run release:check` builds and installs an archive in an isolated folder,
+  validates its file allowlist, checks known credential formats/private store
+  domains, exercises all executable entry points, and verifies flag forwarding.
 
-1. Choose an available npm name (optionally scoped), an owner and repository URL.
-2. Choose an open-source license and add its LICENSE file; update `license`.
-3. Set package metadata (`name`, `repository`, `bugs`, `homepage`) to real values.
-4. Initialize the public repository using the supplied `.gitignore`. Do not add
-   the original `base_custom_cli.sh` or personal `.sshop.json`.
-5. Run the CI matrix and verify native Windows Shopify invocation, real interactive
-   authentication, dev shutdown, and a pull/dev workflow against a disposable theme.
-6. Run `npm pack --dry-run`, inspect the archive contents, and install that archive
-   in a clean environment. The package allowlist includes only runtime, generic
-   examples and documentation.
-7. Set `private` to false only when ready to publish, then publish a versioned npm
-   release from the chosen account. There is no automatic publish workflow.
+The LICENSE contains the owner's chosen public copyright attribution. Personal
+`.sshop.json` and legacy `base_custom_cli.sh` are ignored and excluded from npm.
+Pattern checks reduce leakage risk; they are not a complete security audit.
+
+## Still required before publication
+
+1. Run the current commit's CI workflow successfully.
+2. Validate login, pull, development sync, and Ctrl+C shutdown against an explicitly
+   authorized disposable store/theme and a disposable local theme directory.
+   Check named themes, JSON-only pulls, port selection, and `sl -j` / `si -j`.
+   Never use a production/live theme for this release check.
+3. Run `npm login --registry=https://registry.npmjs.org/` locally and complete the
+   account/2FA prompts, then `npm whoami --registry=https://registry.npmjs.org/`.
+   The account lookup during preparation returned 401. Do not commit credentials.
+4. Once those checks pass, remove `private: true` from package.json, commit the
+   change, and require the resulting commit's CI run to pass.
+5. Run `npm run release:check`, then `npm publish --dry-run` and inspect the file
+   list. Publish the reviewed release using `npm publish --access public` from
+   the authenticated owner's terminal. Nothing here publishes automatically.
+6. Verify `npm view simplified-shopify-cli@0.1.0 dist.integrity`, install that
+   exact published version in a clean environment, then tag the released commit
+   `v0.1.0` and create the GitHub release.
+
+npm versions are immutable. Use a new version for any correction after publishing.
 
 ## Distribution
 
-The primary installation path after release is `npm install -g <chosen-name>`;
-`npx <chosen-name> …` can run a published version without a permanent global install.
-Before publication, use a local directory or `npm pack` archive.
+After publication, users can run `npm install -g simplified-shopify-cli` and use
+`sd`, `sp`, `sl`, and the other commands. Before publication, use the GitHub source
+or an npm pack archive. A CDN is not required for this Node-based CLI.
 
-A CDN can distribute versioned files or archives later. A CLI still runs locally
-under Node; downloading one JavaScript entry file is insufficient because this
-package has sibling modules. Use npm as the first distribution channel. Add a
-version-pinned CDN installer only after there is a stable release URL and a
-checksum verification process; no invented CDN links or remote shell installer
-are included in this prototype.
+## Release summary
 
-## Potential next version
-
-- An interactive setup wizard and shell completion.
-- Named theme presets and environment profiles.
-- A separately specified Git sync workflow with configurable remote/base branch.
-- Optional modules for the non-Shopify tools in the original shell file.
+Initial release: configurable store aliases, personal/project JSON configuration,
+portable direct commands, optional Bash/Zsh and PowerShell integration, literal
+legacy-alias import, dry-run output, development port shorthand (`sd -p`), and
+JSON output shorthand (`sl -j`, `si -j`).
