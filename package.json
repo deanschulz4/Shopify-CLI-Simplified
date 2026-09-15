@@ -1,0 +1,47 @@
+{
+  "name": "simplified-shopify-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Configurable store aliases and shortcuts for Shopify theme development",
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "bin": {
+    "sshop": "bin/sshop.js",
+    "sd": "bin/sd.js",
+    "sp": "bin/sp.js",
+    "sl": "bin/sl.js",
+    "si": "bin/si.js",
+    "spl": "bin/spl.js",
+    "spa": "bin/spa.js",
+    "sc": "bin/sc.js",
+    "sf": "bin/sf.js",
+    "lo": "bin/lo.js",
+    "sstores": "bin/sstores.js",
+    "sconfig": "bin/sconfig.js",
+    "sinit": "bin/sinit.js",
+    "simport": "bin/simport.js",
+    "shelp": "bin/shelp.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "shell/",
+    "examples/",
+    "docs/",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check bin/sshop.js && node --check src/cli.js && node --check src/config.js && node --check src/commands.js",
+    "prepack": "npm run check && npm test"
+  },
+  "keywords": [
+    "shopify",
+    "cli",
+    "themes",
+    "aliases"
+  ]
+}

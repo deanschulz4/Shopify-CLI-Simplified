@@ -1,0 +1,6 @@
+node_modules/
+*.tgz
+.sshop.json
+.sshop.json.*
+base_custom_cli.sh
+.DS_Store

@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "stores": {
+    "demo": "example-store.myshopify.com",
+    "sandbox": "example-sandbox.myshopify.com"
+  },
+  "defaultStore": "sandbox",
+  "defaults": {
+    "nodelete": true,
+    "themeEditorSync": true
+  }
+}

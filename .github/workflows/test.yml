@@ -1,0 +1,38 @@
+name: Test
+on: [push, pull_request]
+jobs:
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [22, 24]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm run check
+      - run: npm test
+      - run: npm pack --dry-run
+      - name: Install archive and verify native Shopify launch
+        shell: bash
+        run: |
+          npm pack --ignore-scripts
+          npm install -g ./simplified-shopify-cli-0.1.0.tgz --ignore-scripts
+          npm install -g @shopify/cli
+          sshop --config examples/sshop.example.json sd demo "Theme with spaces" --dry-run
+          sshop check -- --help
+          sd --config examples/sshop.example.json demo "Theme with spaces" --dry-run
+          sc -- --help
+      - name: Verify PowerShell direct commands and alias overrides
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          sd.cmd --config examples/sshop.example.json demo "Theme with spaces" --dry-run
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          . ([scriptblock]::Create((sshop.cmd shell powershell | Out-String)))
+          sp --config examples/sshop.example.json demo --dry-run
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          sl --config examples/sshop.example.json demo --dry-run
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
