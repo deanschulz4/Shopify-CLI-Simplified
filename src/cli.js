@@ -13,6 +13,7 @@ Usage: sshop [--config FILE] COMMAND [arguments]
   stores                            List merged store aliases
   stores add ALIAS STORE [--global]  Add/update a store in the selected config
   stores remove ALIAS [--global]     Remove a store from the selected config
+  stores . [--global]                Open the stores config file in your editor
   import FILE [--global]             Import literal map_store aliases
   config                            Show effective config and source files
   shell [powershell]                Print shell functions (optional)
@@ -32,7 +33,7 @@ Dev options: --port/-p PORT (example: sd demo -p 9293)
 List/info options: --json/-j (example: sl demo -j)
 Pull options: --live, --development/-d, --json-only/-p
 Info options: --development/-d
-Config writes: --global/-g (init, stores add/remove, import)
+Config writes: --global/-g (init, import; stores add/remove/. default to global)
 Additional Shopify flags go after -- (example: -- --port 9293).
 Select the current store with si STORE; then omit STORE on later theme commands.
 A configured defaultStore overrides the remembered Shopify store. Use si to check.
@@ -43,7 +44,7 @@ Direct commands: sd, sp, sl, si, spl, spa, sc, sf, lo.
 Setup commands: sinit, sstores, sconfig, simport, shelp.
 `;
 
-export async function main(argv) {
+export async function main(argv, { open = openPath } = {}) {
   const args = [...argv];
   let explicit = process.env.SSHOP_CONFIG;
   if (args[0] === '--config') {
@@ -94,13 +95,26 @@ export async function main(argv) {
     }
     console.log(`Saved ${file}`); return 0;
   }
+  if (command === 'stores' && args[0] === '.') {
+    const normalized = args.map(arg => arg === '-g' ? '--global' : arg);
+    const useGlobal = normalized.includes('--global');
+    if (normalized.filter(arg => arg !== '--global' && arg !== '.').length) throw new Error('Usage: sshop stores . [--global]');
+    if (useGlobal && explicit) throw new Error('Choose --global or --config, not both.');
+    const file = explicit ? path.resolve(explicit) : path.join(useGlobal ? os.homedir() : process.cwd(), filename);
+    if (!fs.existsSync(file)) {
+      writeConfig(file, { version: 1, stores: {}, defaults: { nodelete: true, themeEditorSync: true } }, { create: true });
+      console.log(`Created ${file}`);
+    }
+    await open(file);
+    return 0;
+  }
   const loaded = loadConfig({ explicit });
   if (command === 'config') {
     if (args.length) throw new Error('Usage: sshop config');
     console.log(JSON.stringify(loaded, null, 2)); return 0;
   }
   if (command === 'stores') {
-    if (args.length && !(args.length === 1 && args[0] === 'list')) throw new Error('Usage: sshop stores [list|add|remove]');
+    if (args.length && !(args.length === 1 && args[0] === 'list')) throw new Error('Usage: sshop stores [list|add|remove|.]');
     const entries = Object.entries(loaded.config.stores).sort(([a], [b]) => a.localeCompare(b));
     console.log(entries.length ? entries.map(([alias, store]) => `${alias}\t${normalizeStore(store)}`).join('\n') : 'No store aliases yet. Run: sshop stores add demo example-store');
     return 0;
@@ -108,6 +122,17 @@ export async function main(argv) {
   const built = buildCommand(command, args, loaded.config);
   if (built.dryRun) { console.log(formatCommand(built.args)); return 0; }
   return runShopify(built.args);
+}
+
+export async function openPath(target, { platform = process.platform } = {}) {
+  const opener = platform === 'darwin' ? ['open', target]
+    : platform === 'win32' ? ['cmd', '/c', 'start', '', target]
+    : ['xdg-open', target];
+  return new Promise((resolve, reject) => {
+    const child = spawn(opener[0], opener.slice(1), { stdio: 'ignore', shell: platform === 'win32' });
+    child.once('error', error => reject(new Error(error.code === 'ENOENT' ? `Could not open ${target}. Set EDITOR or open the file manually.` : error.message)));
+    child.once('exit', code => code === 0 ? resolve() : reject(new Error(`Could not open ${target}.`)));
+  });
 }
 
 export async function runShopify(args, { platform = process.platform } = {}) {

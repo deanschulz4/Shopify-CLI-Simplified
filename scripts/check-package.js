@@ -16,7 +16,7 @@ function npm(args) {
 }
 try {
   const [packed] = JSON.parse(npm(['pack', '--ignore-scripts', '--json', '--pack-destination', temp]));
-  const permitted = /^(?:package\.json|README\.md|LICENSE|bin\/[^/]+\.js|src\/[^/]+\.js|shell\/shortcuts\.(?:sh|ps1)|examples\/sshop\.example\.json|docs\/RELEASING\.md)$/;
+  const permitted = /^(?:package\.json|README\.md|LICENSE|bin\/[^/]+\.js|src\/[^/]+\.js|scripts\/postinstall\.js|shell\/shortcuts\.(?:sh|ps1)|examples\/sshop\.example\.json|docs\/RELEASING\.md)$/;
   for (const entry of packed.files) assert.ok(permitted.test(entry.path), `Unexpected packaged file: ${entry.path}`);
   assert.ok(packed.files.some(entry => entry.path === 'LICENSE'), 'License missing');
   const prefix = path.join(temp, 'install with spaces');

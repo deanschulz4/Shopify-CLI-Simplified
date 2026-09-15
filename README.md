@@ -17,18 +17,36 @@ Works on macOS, Linux, and Windows. No extra setup for macOS/zsh.
 **PowerShell:** use `npm.cmd` and commands such as `si.cmd` and `sp.cmd`,
 or enable [short commands](#shell-setup).
 
-## 2. Add your store
+## 2. Store Abreviations Mapping
 
-```sh
-sinit -g
-sstores add demo example-store -g
+Personal config is created automatically on install at `~/.sshop.json`.
+
+
+| Command                       | Description                     |
+| ----------------------------- | ------------------------------- |
+| `sstores add <alias> <store>` | Add or update a store alias     |
+| `sstores remove <alias>`      | Remove a store alias            |
+| `sstores .`                   | Edit stores in your config file |
+
+
+Example `~/.sshop.json`:
+
+```json
+{
+  "version": 1,
+  "stores": {
+    "sto": "store-example.myshopify.com",
+    "san": "sandbox-example.myshopify.com"
+  },
+  "defaultStore": "san",
+  "defaults": {
+    "nodelete": true, // keep local files when pulling
+    "themeEditorSync": true // sync Theme Editor changes during dev
+  }
+}
 ```
 
-- `demo`: your chosen store abbreviation.
-- `example-store`: the prefix of your `example-store.myshopify.com` address.
-- Repeat `sstores add` for each store.
 
-`-g` saves settings for all projects. Skip `sinit -g` if already configured.
 
 ## 3. Start working
 
@@ -52,37 +70,43 @@ the remembered store; see [configuration](#configuration).
 ## Command cheat sheet
 
 Run theme commands from your theme project folder. Put quotes around theme names
-with spaces. `<store_abr>` means the short name you configured, such as `demo`.
+with spaces. `<store_abr>` means the short name you configured, such as `san`.
 
-| Command | What it does |
-| --- | --- |
-| `si <store_abr>` | Select a store |
-| `si` | Show current store and theme |
-| `sl` | List themes |
-| `sd` | Start a development theme |
-| `sd "My Theme"` | Develop a named theme with editor sync |
-| `sp` | Pull the live theme |
-| `sp "My Theme"` | Pull a named theme |
-| `sp -p` | Pull only live template/config JSON |
-| `spl "My Theme"` | Pull named theme template/config JSON |
-| `sp -d` | Pull the development theme |
-| `spa` | Pull live; may delete unmatched local files |
-| `sc` | Check theme code |
-| `sf` | Fix supported code issues |
-| `lo` | Log out of Shopify |
-| `shelp` | Show help |
+
+| Command          | What it does                                |
+| ---------------- | ------------------------------------------- |
+| `si <store_abr>` | Select a store                              |
+| `si`             | Show current store and theme                |
+| `sl`             | List themes                                 |
+| `sd`             | Start a development theme                   |
+| `sd "My Theme"`  | Develop a named theme with editor sync      |
+| `sp`             | Pull the live theme                         |
+| `sp "My Theme"`  | Pull a named theme                          |
+| `sp -p`          | Pull only live template/config JSON         |
+| `spl "My Theme"` | Pull named theme template/config JSON       |
+| `sp -d`          | Pull the development theme                  |
+| `spa`            | Pull live; may delete unmatched local files |
+| `sc`             | Check theme code                            |
+| `sf`             | Fix supported code issues                   |
+| `lo`             | Log out of Shopify                          |
+| `shelp`          | Show help                                   |
+
+
+
 
 ### Options
 
-| Option | Example | Meaning |
-| --- | --- | --- |
-| `-g` / `--global` | `sinit -g` | Personal config (setup commands) |
-| `-d` / `--development` | `sp -d` | Development theme (`sp`, `spl`, `spa`, `si`) |
-| `-p PORT` / `--port PORT` | `sd -p 9293` | Change the development port |
-| `-p` / `--json-only` | `sp -p` | Pull only template/config JSON |
-| `-j` / `--json` | `sl -j` | JSON output (`sl`, `si`) |
-| `--dry-run` | `sd "My Theme" --dry-run` | Preview without running |
-| `-s` and `-t` | `sd -s demo -t "My Theme"` | Choose store and theme |
+
+| Option                    | Example                    | Meaning                                                            |
+| ------------------------- | -------------------------- | ------------------------------------------------------------------ |
+| `-g` / `--global`         | `sinit -g`                 | Personal config (`sinit`, `simport`; `sstores` defaults to global) |
+| `-d` / `--development`    | `sp -d`                    | Development theme (`sp`, `spl`, `spa`, `si`)                       |
+| `-p PORT` / `--port PORT` | `sd -p 9293`               | Change the development port                                        |
+| `-p` / `--json-only`      | `sp -p`                    | Pull only template/config JSON                                     |
+| `-j` / `--json`           | `sl -j`                    | JSON output (`sl`, `si`)                                           |
+| `--dry-run`               | `sd "My Theme" --dry-run`  | Preview without running                                            |
+| `-s` and `-t`             | `sd -s demo -t "My Theme"` | Choose store and theme                                             |
+
 
 **Before running commands:** `sp` overwrites matching local files; `spa` can also
 delete unmatched files. `sd` uploads and continuously syncs changes to the selected
@@ -90,23 +114,25 @@ remote theme. `sf` changes local code. Use `--dry-run` to check your target firs
 
 ## Manage your stores
 
-| Command | What it does |
-| --- | --- |
-| `sstores` | List store aliases |
-| `sstores add <store_abr> example-store -g` | Add or update an alias |
-| `sstores remove <store_abr> -g` | Remove an alias |
-| `sconfig` | Show settings and config locations |
-| `sinit` | Create a project config |
-| `sinit -g` | Create personal config (never overwrites) |
-| `simport ./base_custom_cli.sh -g` | Import legacy store aliases |
+
+| Command                                 | What it does                              |
+| --------------------------------------- | ----------------------------------------- |
+| `sstores`                               | List store aliases                        |
+| `sstores add <store_abr> example-store` | Add or update an alias                    |
+| `sstores remove <store_abr>`            | Remove an alias                           |
+| `sconfig`                               | Show settings and config locations        |
+| `sstores .`                             | Open your personal stores config          |
+| `sinit`                                 | Create a project config                   |
+| `sinit -g`                              | Create personal config (never overwrites) |
+| `simport ./base_custom_cli.sh -g`       | Import legacy store aliases               |
+
 
 `sinit` creates config. `si` selects a store.
 Keep credentials out of `.sshop.json`. Keep personal project configs out of Git.
 
 ## Shell setup
 
-<details>
-<summary>Windows PowerShell: use commands without .cmd</summary>
+Windows PowerShell: use commands without .cmd
 
 If your PowerShell profile allows scripts, add:
 
@@ -119,10 +145,7 @@ To undo, remove the line and restart PowerShell.
 
 Command Prompt needs no setup. For WSL, install Node and both CLIs inside WSL.
 
-</details>
-
-<details>
-<summary>macOS/zsh or Bash: replace older Shopify aliases</summary>
+macOS/zsh or Bash: replace older Shopify aliases
 
 If old Shopify aliases override these commands, remove them or add this
 after them in your shell profile:
@@ -133,12 +156,9 @@ eval "$(sshop shell)"
 
 Restart your terminal.
 
-</details>
-
 ## Configuration
 
-<details>
-<summary>Optional settings</summary>
+Optional settings
 
 - Personal config: `~/.sshop.json` (macOS/Linux) or `%USERPROFILE%\.sshop.json` (Windows).
 - Project config: `.sshop.json`; overrides personal settings. Omit `-g` to edit it.
@@ -154,9 +174,6 @@ Use `-s STORE` for an unconfigured store prefix.
 
 Put extra Shopify options after `--`: `sd -- --verbose`.
 Keep store/theme options and `--dry-run` before `--`.
-
-
-</details>
 
 ## Uninstall
 

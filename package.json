@@ -27,6 +27,7 @@
   "files": [
     "bin/",
     "src/",
+    "scripts/postinstall.js",
     "shell/",
     "examples/",
     "docs/",
@@ -35,7 +36,9 @@
   ],
   "scripts": {
     "test": "node --test",
-    "check": "node --check bin/sshop.js && node --check src/cli.js && node --check src/config.js && node --check src/commands.js",
+    "check": "node --check bin/sshop.js && node --check src/cli.js && node --check src/config.js && node --check src/commands.js && node --check scripts/postinstall.js",
+    "postinstall": "node scripts/postinstall.js",
+    "generate:pdf": "python3 scripts/generate-cheat-sheet.py",
     "prepack": "npm run check && npm test",
     "release:check": "npm run check && npm test && node scripts/check-package.js"
   },

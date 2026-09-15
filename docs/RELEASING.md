@@ -17,6 +17,9 @@ alias import, dry-run output, development port shorthand (`sd -p`), JSON output
 
 ## Verification
 
+- Regenerate `output/pdf/shopify-command-cheat-sheet.pdf` with
+  `npm run generate:pdf` when command docs change (requires Python 3 and
+  `reportlab`).
 - Node 22/24 CI on macOS, Linux, and Windows checks the installed archive,
   command entry points, real Shopify CLI help, and PowerShell shortcuts.
 - `npm run release:check` checks syntax, runs tests, builds and installs an

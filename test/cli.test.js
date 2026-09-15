@@ -6,6 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildCommand, formatCommand } from '../src/commands.js';
+import { main } from '../src/cli.js';
 import { normalizeStore, loadConfig, writeConfig, validateConfig, importAliases } from '../src/config.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -218,6 +219,32 @@ test('development shorthand supports pull and info, and store omission preserves
   assert.throws(() => build('sp', ['-d', '--development']), /only one/);
   assert.throws(() => build('si', ['-d', '-t', '123']), /either/);
   assert.throws(() => build('sd', ['-d']), /applies/);
+});
+
+test('stores mutations default to global configuration', t => {
+  const home = temporary(t), cwd = path.join(home, 'project');
+  fs.mkdirSync(cwd);
+  const run = args => spawnSync(process.execPath, [path.join(root, 'bin/sstores.js'), ...args], { cwd, encoding: 'utf8', env: { ...process.env, HOME: home, USERPROFILE: home, SSHOP_CONFIG: '' } });
+  assert.equal(run(['add', 'demo', 'example-store']).status, 0);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(home, '.sshop.json'), 'utf8')).stores.demo, 'example-store.myshopify.com');
+  assert.equal(fs.existsSync(path.join(cwd, '.sshop.json')), false);
+});
+
+test('stores . creates and opens the global stores file', async t => {
+  const home = temporary(t);
+  const previousHome = process.env.HOME;
+  const previousProfile = process.env.USERPROFILE;
+  process.env.HOME = home;
+  process.env.USERPROFILE = home;
+  t.after(() => {
+    process.env.HOME = previousHome;
+    process.env.USERPROFILE = previousProfile;
+  });
+  const file = path.join(home, '.sshop.json');
+  const opened = [];
+  assert.equal(await main(['stores', '.', '-g'], { open: target => { opened.push(target); } }), 0);
+  assert.equal(fs.existsSync(file), true);
+  assert.deepEqual(opened, [file]);
 });
 
 test('global shorthand writes only the selected personal configuration', t => {
