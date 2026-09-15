@@ -1,6 +1,6 @@
 # Simplified Shopify CLI
 
-Short commands for Shopify themes: `sd` to develop, `sp` to pull, and `sl` to list themes.
+Short commands for Shopify themes: `sd` to develop, `sp` to pull, and `sl` to list themes. The customizable store abreviations mapping lets you assign short aliases to your Shopify stores for even quicker switching and command usage.
 
 [Download the one-page cheat sheet (PDF)](https://github.com/deanschulz4/Shopify-CLI-Simplified/raw/refs/heads/main/output/pdf/shopify-command-cheat-sheet.pdf)
 
