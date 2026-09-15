@@ -18,8 +18,8 @@ jobs:
       - name: Install archive and verify native Shopify launch
         shell: bash
         run: |
-          npm pack --ignore-scripts
-          npm install -g ./simplified-shopify-cli-0.1.0.tgz --ignore-scripts
+          archive=$(npm pack --ignore-scripts --json | node -e 'let data=""; process.stdin.on("data", chunk => data += chunk); process.stdin.on("end", () => process.stdout.write(JSON.parse(data)[0].filename));')
+          npm install -g "./$archive" --ignore-scripts
           npm install -g @shopify/cli
           sshop --config examples/sshop.example.json sd demo "Theme with spaces" --dry-run
           sshop check -- --help
