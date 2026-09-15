@@ -4,13 +4,12 @@ Short Shopify theme commands with store aliases you configure in a JSON dotfile.
 Installing the package provides **`sd`, `sp`, `sl`, `si`, `spl`, `spa`, `sc`, `sf`,
 and `lo` directly**. The `sshop` command remains available for compatibility.
 
-This is the **0.1.0 release candidate**, licensed under MIT, with no runtime
+This is the **0.1.0 release**, licensed under MIT, with no runtime
 dependencies. Source: [deanschulz4/Shopify-CLI-Simplified](https://github.com/deanschulz4/Shopify-CLI-Simplified).
 
-The npm package is not published yet. Publication remains disabled until the
-final release checks are complete. See [release preparation](docs/RELEASING.md).
+Install from npm using the instructions below. See [release notes and verification](docs/RELEASING.md).
 
-## Install locally
+## Install
 
 Requires Node.js 22.12+ and Shopify CLI on your PATH. Authentication remains
 managed by Shopify CLI. Install Shopify CLI if you do not already have it:
@@ -19,12 +18,14 @@ managed by Shopify CLI. Install Shopify CLI if you do not already have it:
 npm install -g @shopify/cli
 ```
 
-From this project directory:
+Install the published package (including zsh on macOS):
 
 ```sh
-npm install -g .
-sshop --help
+npm install -g simplified-shopify-cli
+shelp
 ```
+
+To install from a source checkout instead, run `npm install -g .` from the project directory.
 
 Or try it without a global installation:
 
@@ -199,7 +200,7 @@ Restart the shell. General helpers in the original file are unaffected.
 
 ### Windows Command Prompt and PowerShell
 
-Install with `npm.cmd install -g .`. Command Prompt can use `sd`, `sp`, etc.
+Install with `npm.cmd install -g simplified-shopify-cli`. Command Prompt can use `sd`, `sp`, etc.
 In PowerShell, use `sd.cmd`, `sp.cmd`, `sl.cmd`, etc. to avoid conflicts with
 built-in aliases and npm PowerShell script execution policy restrictions:
 
