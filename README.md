@@ -2,6 +2,8 @@
 
 Short commands for Shopify themes: `sd` to develop, `sp` to pull, and `sl` to list themes.
 
+[Download the one-page cheat sheet (PDF)](https://github.com/deanschulz4/Shopify-CLI-Simplified/raw/refs/heads/main/output/pdf/shopify-command-cheat-sheet.pdf)
+
 ## 1. Install
 
 Install **Node.js 22.12 or newer**, then run:
