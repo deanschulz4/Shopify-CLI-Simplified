@@ -47,6 +47,23 @@ Personal `.sshop.json` and legacy `base_custom_cli.sh` are ignored and excluded
 from npm. The LICENSE contains the owner's public copyright attribution.
 Pattern checks reduce leakage risk; they are not a complete security audit.
 
+## Publishing authentication
+
+`npm login` session tokens still require a one-time password when 2FA is enabled
+for publishing. For OTP-free publishes, create a token once and store it in your
+user `~/.npmrc` (never commit it):
+
+1. Sign in at [npmjs.com](https://www.npmjs.com/) → **Access Tokens** → **Generate New Token**.
+2. Choose **Granular Access Token** (recommended) or **Classic Automation Token**.
+3. Grant **Read and write** access to the `simplified-shopify-cli` package.
+4. Save the token locally:
+
+```sh
+npm config set //registry.npmjs.org/:_authToken=YOUR_TOKEN --location=user
+```
+
+After that, `npm publish ARCHIVE --access public` works without `--otp`.
+
 ## Publishing procedure
 
 1. Update the version and documentation; run `npm run release:check`.
