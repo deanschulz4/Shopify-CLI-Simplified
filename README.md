@@ -1,271 +1,179 @@
 # Simplified Shopify CLI
 
-Short Shopify theme commands with store aliases you configure in a JSON dotfile.
-Installing the package provides **`sd`, `sp`, `sl`, `si`, `spl`, `spa`, `sc`, `sf`,
-and `lo` directly**. The `sshop` command remains available for compatibility.
+Short commands for Shopify theme development. Use `sd` to develop, `sp` to pull,
+and `sl` to list themes. No `sshop` prefix needed.
 
-This is the **0.1.0 release**, licensed under MIT, with no runtime
-dependencies. Source: [deanschulz4/Shopify-CLI-Simplified](https://github.com/deanschulz4/Shopify-CLI-Simplified).
+## 1. Install
 
-Install from npm using the instructions below. See [release notes and verification](docs/RELEASING.md).
-
-## Install
-
-Requires Node.js 22.12+ and Shopify CLI on your PATH. Authentication remains
-managed by Shopify CLI. Install Shopify CLI if you do not already have it:
+Install **Node.js 22.12 or newer**, then run:
 
 ```sh
-npm install -g @shopify/cli
+npm install -g @shopify/cli simplified-shopify-cli
 ```
 
-Install the published package (including zsh on macOS):
+Works on macOS, Linux, and Windows. On macOS/zsh, no extra shell setup is needed.
+**PowerShell users:** use `npm.cmd` to install and add `.cmd` to commands below
+(for example, `sinit.cmd`, `si.cmd`, and `sp.cmd`). See [shell setup](#shell-setup)
+for commands without `.cmd`.
+
+## 2. Add your store
 
 ```sh
-npm install -g simplified-shopify-cli
-shelp
+sinit -g
+sstores add demo example-store -g
 ```
 
-To install from a source checkout instead, run `npm install -g .` from the project directory.
+Replace `demo` with any short name you want. Replace `example-store` with the
+first part of your store's `example-store.myshopify.com` address—not its custom
+website domain. Repeat the second command to add more stores.
 
-Or try it without a global installation:
+`-g` saves your stores in your personal `.sshop.json`, available from any project.
+If you already have this file, skip `sinit -g`.
+
+## 3. Start working
+
+Open your theme project folder in a terminal, then select your store:
 
 ```sh
-node bin/sshop.js --help
-node bin/sshop.js --config examples/sshop.example.json sd demo "My Theme" --dry-run
+si demo
 ```
 
-## Configure your stores
-
-Create a personal config usable from any project:
+Complete Shopify's login prompt if asked. After this succeeds, you can omit the
+store name:
 
 ```sh
-sshop init --global
-sshop stores add demo example-store --global
-sshop stores add sandbox example-sandbox.myshopify.com --global
-sshop stores
+sl
+sd "My Theme"
 ```
 
-This creates `~/.sshop.json`. For project-specific configuration, run the same
-commands without `--global` from the project root. Example:
+Run `si` to check the current store, or `si another-alias` to switch.
+The selected store is **not tied to your project folder**, so check it when
+switching projects. A configured `defaultStore` takes priority over the remembered
+store; see [advanced configuration](#advanced-configuration).
 
-```json
-{
-  "version": 1,
-  "stores": {
-    "demo": "example-store.myshopify.com",
-    "sandbox": "example-sandbox.myshopify.com"
-  },
-  "defaultStore": "sandbox",
-  "defaults": {
-    "nodelete": true,
-    "themeEditorSync": true
-  }
-}
-```
+## Command cheat sheet
 
-Store values accept Shopify store prefixes, full `myshopify.com` domains, or
-their HTTPS URLs. Custom storefront domains are not accepted. Config is data;
-it cannot contain shell commands. Keep authentication tokens in Shopify's normal
-authentication flow or environment variables, outside this file.
-
-### Config precedence
-
-1. Built-in defaults: preserve unmatched local files during pull; enable Theme Editor sync during dev.
-2. Personal `~/.sshop.json`.
-3. The nearest `.sshop.json`, searching upward from your current directory.
-
-Project aliases override personal aliases with the same name. Other aliases
-remain available. Set `defaultStore` to `null` to clear an inherited default.
-With no configured default or explicit store, Shopify resolves its own store.
-
-`sshop --config /path/to/config.json …` or `SSHOP_CONFIG` selects a single isolated
-config instead of merging. An explicit missing config is an error.
-`sshop config` shows the effective settings and exact source files.
-
-Writes always target the current directory, or the personal file with `--global`,
-or the explicitly selected file. They never silently modify an ancestor's config.
-`init` refuses to overwrite an existing file. `stores add` explicitly replaces
-an existing alias; `stores remove ALIAS` removes it only from the selected file.
-Removing a project override can expose the personal alias again.
-
-Add `.sshop.json` to each theme project's `.gitignore` if it contains personal
-store mappings. This package excludes local configuration and legacy source
-from its distributable archive.
-
-## Shopify command cheat sheet
-
-### Rules
-
-- Run theme commands from your theme project folder.
-- Replace `<store_abr>` with your configured store abbreviation.
-- Select the current store once with `si <store_abr>`. After it succeeds, omit `<store_abr>` in commands such as `sl`, `sd "My Theme"`, `sp -p`, `sp -d`, and `si -j`.
-- Run `si` to check the current store; specify another abbreviation to switch.
-- Store aliases are still required when adding or removing aliases.
-
-### Flags
-
-- `-g` = `--global` for `sinit`, `sstores add/remove`, and `simport`.
-- `-d` = `--development` for `sp`, `spl`, `spa`, and `si`.
-- Both long and short forms work.
-
-### Important
-
-- A configured `defaultStore` overrides the remembered Shopify store. `si` does not change `defaultStore`; clear it or set it to the intended store.
-- The selected store is not permanently bound to your project.
-- `si --dry-run` does not select a store.
-- `sinit` creates configuration only.
-
-This follows Shopify's [connecting-to-a-store behavior](https://shopify.dev/docs/storefronts/themes/tools/cli#connecting-to-a-store).
-
-### Commands
+Run theme commands from your theme project folder. Put quotes around theme names
+with spaces. `<store_abr>` means the short name you configured, such as `demo`.
 
 | Command | What it does |
 | --- | --- |
-| `si <store_abr>` | Select the current Shopify store and show theme information; omit `<store_abr>` in later theme commands |
-| `sl` | List all themes |
-| `sd "Theme Name"` or `sd Theme_Name` | Start development on a named theme with editor sync |
+| `si <store_abr>` | Select a store and show theme information |
+| `si` | Check the current store/theme information |
+| `sl` | List themes |
 | `sd` | Start development using a Shopify development theme |
-| `sp "Theme Name"` or `sp theme_name` | Pull a named theme; preserve unmatched local files |
-| `sp` | Pull the live theme; preserve unmatched local files |
+| `sd "My Theme"` | Develop on a named theme with editor sync |
+| `sp` | Pull the live theme |
+| `sp "My Theme"` | Pull a named theme |
 | `sp -p` | Pull only live template/config JSON |
-| `spl "My Theme"` | Pull only template/config JSON from a named theme |
-| `spa` | Pull the live theme; may delete unmatched local files |
+| `spl "My Theme"` | Pull only a named theme's template/config JSON |
 | `sp -d` | Pull the development theme |
-| `sc` | Check theme code for issues |
-| `sf` | Automatically fix supported theme issues |
+| `spa` | Pull the live theme and allow deletion of unmatched local files |
+| `sc` | Check theme code |
+| `sf` | Fix supported code issues |
 | `lo` | Log out of Shopify |
+| `shelp` | Show help |
 
-### Store aliases and setup
+### Options
+
+| Option | Example | Meaning |
+| --- | --- | --- |
+| `-g` / `--global` | `sinit -g` | Use personal config; also works with alias add/remove and import |
+| `-d` / `--development` | `sp -d` | Select the development theme; works with `sp`, `spl`, `spa`, and `si` |
+| `-p PORT` / `--port PORT` | `sd -p 9293` | Change the development port |
+| `-p` / `--json-only` | `sp -p` | Pull only template/config JSON |
+| `-j` / `--json` | `sl -j` | Return JSON; also works with `si` |
+| `--dry-run` | `sd "My Theme" --dry-run` | Preview a command without running it |
+| `-s` and `-t` | `sd -s demo -t "My Theme"` | Explicitly select a store and theme |
+
+**Before running commands:** `sp` overwrites matching local files; `spa` can also
+delete unmatched files. `sd` uploads and continuously syncs changes to the selected
+remote theme. `sf` changes local code. Use `--dry-run` to check your target first.
+
+## Manage your stores
 
 | Command | What it does |
 | --- | --- |
-| `sstores` | List available store aliases |
-| `sstores add <store_abr> example-store -g` | Add/update a personal store alias |
-| `sstores remove <store_abr> -g` | Remove a personal store alias |
-| `sconfig` | Show effective settings and config locations |
-| `sinit` | Create a project-specific config |
-| `sinit -g` | Create a personal config; refuses to overwrite |
-| `simport ./base_custom_cli.sh -g` | Import aliases from the original file |
-| `shelp` | Show command help |
+| `sstores` | List store aliases |
+| `sstores add <store_abr> example-store -g` | Add or update an alias |
+| `sstores remove <store_abr> -g` | Remove an alias |
+| `sconfig` | Show settings and config locations |
+| `sinit` | Create a project config |
+| `sinit -g` | Create a personal config without overwriting one |
+| `simport ./base_custom_cli.sh -g` | Import store aliases from the original script |
 
-### Useful options
-
-| Example | What it does |
-| --- | --- |
-| `sd "My Theme" --dry-run` | Preview the command without running Shopify |
-| `sd -s <store_abr> -t "My Theme"` | Explicitly select store and theme |
-| `sd -p 9293` | Use a different development port |
-| `sl -j` | Return the theme list as JSON |
-| `sd --config "./custom.json"` | Use a specific configuration file |
-
-### Remember
-
-- Quotes are required for theme names containing spaces. Use straight quotes (`"`) when copying commands into your terminal.
-- Pull (`sp`) overwrites matching local files. Preserving unmatched files does not prevent existing files from being overwritten.
-- Dev (`sd`) uploads and continuously syncs changes to the selected remote theme.
-- `sd <store_abr> -p 9293` sets the development port; `sp <store_abr> -p` pulls only template/config JSON.
-- `si <store_abr> -j` returns theme information as JSON; `sl <store_abr> -j` returns the theme list as JSON.
-- `sf` modifies local files. Use `--dry-run` to inspect command targeting before running Shopify.
-
-### Argument handling and compatibility
-
-All commands above work without an `sshop` prefix. The prefixed equivalents
-remain supported, for example `sshop dev`, `sshop pull`, and `sshop sd`.
-
-A single positional argument to `sd`/`sp` is a store if it matches a configured
-alias or looks like a URL/domain; otherwise it is a theme. With two positional
-arguments, they mean store and theme. Use `--store` for an unmapped prefix with
-no theme; use `--theme` when a theme name matches an alias.
-
-Wrapper flags use separate values (`--store demo`, not `--store=demo`). Additional
-Shopify flags go after `--`. Put targeting flags and `--dry-run` before `--`.
-The original `sd -- --port 9293` and `sl -- --json` forms remain supported;
-`--port` and `--json` also work directly. Nodelete/editor-sync defaults are
-configured in the dotfile.
-
-`--dry-run` prints the command without starting Shopify and redacts password
-values. Arguments are forwarded as an array, without `eval` or shell expansion.
-Normal commands inherit Shopify's interactive terminal and exit code.
-Shopify's live-theme protections remain in place.
+`sinit` creates configuration; it does not select or log into a store.
+Keep credentials out of `.sshop.json`. Keep personal project configs out of Git.
 
 ## Shell setup
 
-### macOS / Bash / Zsh
+<details>
+<summary>Windows PowerShell: use commands without .cmd</summary>
 
-No shell setup is needed for the installed executable commands. If you still load
-old aliases/functions from `base_custom_cli.sh`, they take precedence over
-executables. Remove the old Shopify definitions, or load the compatibility
-functions after the old file using `eval "$(sshop shell)"` in your shell profile.
-Restart the shell. General helpers in the original file are unaffected.
-
-### Windows Command Prompt and PowerShell
-
-Install with `npm.cmd install -g simplified-shopify-cli`. Command Prompt can use `sd`, `sp`, etc.
-In PowerShell, use `sd.cmd`, `sp.cmd`, `sl.cmd`, etc. to avoid conflicts with
-built-in aliases and npm PowerShell script execution policy restrictions:
-
-```powershell
-sinit.cmd --global
-sstores.cmd add demo example-store --global
-sd.cmd demo "My Theme" --dry-run
-```
-
-For exactly `sd`, `sp`, `sl`, etc. in PowerShell, add this one-time setup to your
-PowerShell profile (provided profile scripts are permitted in your environment):
+Add this to your PowerShell profile, if profile scripts are permitted:
 
 ```powershell
 . ([scriptblock]::Create((sshop.cmd shell powershell | Out-String)))
 ```
 
-It replaces matching PowerShell aliases with functions forwarding to the installed
-`.cmd` commands. This includes `sp`, `sl`, and `si`; their normal PowerShell
-meanings will change in that session. Remove the profile line and restart to
-restore the original behavior. No execution-policy changes are made by this package.
+This replaces conflicting aliases such as `sp`, `sl`, and `si` in that session.
+Remove the line and restart PowerShell to restore their original meanings.
+The package does not change your execution policy.
 
-Personal config on Windows is `%USERPROFILE%\.sshop.json`. Shopify CLI must be
-installed globally with npm. In WSL, install Node and both CLIs inside WSL and
-follow the Bash instructions.
+Command Prompt can use the short commands directly. In WSL, install Node and
+both CLIs inside WSL and follow the Linux instructions.
 
-**Verification:** the [initial CI run](https://github.com/deanschulz4/Shopify-CLI-Simplified/actions/runs/34994515508)
-passed the Node 22/24 matrix on macOS, Linux, and Windows, including installed
-commands, real Shopify CLI help invocation, and Windows PowerShell shortcuts.
-Each subsequent change must pass its own CI run. Live Shopify login/pull/dev
-workflows remain a separate pre-release check.
+</details>
 
-## Migrate the original file
+<details>
+<summary>macOS/zsh or Bash: replace older Shopify aliases</summary>
+
+If you load the old `base_custom_cli.sh`, its aliases may override these commands.
+Remove its Shopify aliases, or add this after the old file in your shell profile:
 
 ```sh
-sshop import ./base_custom_cli.sh --global
+eval "$(sshop shell)"
 ```
 
-Import reads literal entries from `map_store()` without sourcing the shell file.
-Identical duplicate mappings are collapsed; conflicting duplicates or existing
-aliases with different destinations stop the import. Other shell logic is ignored.
-Use a local import first if you want to inspect the result before changing your
-personal config.
+Restart your terminal. Other helpers in the original script are unaffected.
 
-The original file stays unchanged as a local reference. General terminal,
-Node/nvm, BigCommerce, and NopCommerce helpers remain there; this first package
-focuses on Shopify. The old `sync` helper remains there too: its hard-coded
-`origin/master` merge and checkout behavior needs a separate configurable design.
-It is not installed by this package. The old `fix` permissions alias and `gitfix`
-are also not exported. `clis` is still the ordinary Shopify installation command.
+</details>
 
-## Development and verification
+## Advanced configuration
 
-```sh
-npm run release:check
-npm pack
-```
+<details>
+<summary>Config files, default stores, and extra Shopify options</summary>
 
-Tests cover config resolution, migration, argument handling, shell forwarding,
-and subprocess exit codes using a fake Shopify executable. They do not contact
-stores. The CI workflow checks Node 22/24 on macOS, Linux, and Windows and runs
-`npm run release:check` to inspect and install the actual npm archive.
-Native Windows dispatch supports the global npm installation of Shopify CLI.
+Personal config: `~/.sshop.json` on macOS/Linux or `%USERPROFILE%\.sshop.json`
+on Windows. The nearest project `.sshop.json` overrides personal settings.
+Omit `-g` when adding/removing aliases to update the current folder's config.
 
-Shopify command behavior follows the official [theme pull](https://shopify.dev/docs/api/shopify-cli/theme/theme-pull)
-and [theme dev](https://shopify.dev/docs/api/shopify-cli/theme/theme-dev) documentation.
+See the [example configuration](examples/sshop.example.json). Set `defaultStore`
+to an alias for a fixed default, or `null` to use Shopify's remembered store.
+`si` does not change this setting, and `si --dry-run` does not select a store.
+
+Use `sd --config "./custom.json"` or `SSHOP_CONFIG` to load one config file instead
+of merging personal and project settings. `sconfig` shows which files are used.
+
+If a theme name matches a store alias, use `-t "Theme Name"`. Use `-s STORE` for
+an unconfigured store prefix. Give option values separately: `-s demo`.
+
+Additional Shopify options go after `--`, for example `sd -- --verbose`.
+Put store/theme options and `--dry-run` before that separator.
+The `sshop` command and long option names remain supported.
+
+Import reads literal store aliases without executing the original shell script.
+Conflicting aliases stop the import; unrelated shell functions are not imported.
+
+</details>
+
+## Contributing
+
+From a source checkout, run `npm install -g .` to install locally and
+`npm run release:check` to test and inspect the package.
+
+Automated checks cover macOS, Linux, and Windows. Live store login, pull, and
+sync are not covered by those tests. See [release details](docs/RELEASING.md).
 
 ## Uninstall
 
@@ -273,9 +181,6 @@ and [theme dev](https://shopify.dev/docs/api/shopify-cli/theme/theme-dev) docume
 npm uninstall -g simplified-shopify-cli
 ```
 
-Remove the optional shell startup line and restart your shell. Config files stay
-in place for reuse; remove them yourself when no longer needed.
+Remove any optional shell profile line too. Your config files are kept.
 
-## License
-
-[MIT](LICENSE). The copyright attribution is public; personal store configuration is excluded from the npm package.
+[MIT License](LICENSE)
