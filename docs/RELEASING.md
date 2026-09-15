@@ -1,3 +1,8 @@
+# Release 0.1.5
+
+Remove `postinstall` to avoid npm `allow-scripts` warnings on global install.
+Personal config is now created on first command use instead.
+
 # Release 0.1.4
 
 README fix: use `jsonc` for the config example so inline default comments preview correctly.

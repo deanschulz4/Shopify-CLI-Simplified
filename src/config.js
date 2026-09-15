@@ -4,7 +4,14 @@ import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 
 export const filename = '.sshop.json';
+export const emptyConfig = { version: 1, stores: {}, defaults: { nodelete: true, themeEditorSync: true } };
 const own = (object, key) => Object.hasOwn(object, key);
+
+export function ensureGlobalConfig({ home = os.homedir() } = {}) {
+  const file = path.join(home, filename);
+  if (!fs.existsSync(file)) writeConfig(file, emptyConfig, { create: true });
+  return file;
+}
 export function normalizeStore(value) {
   if (typeof value !== 'string') throw new Error('Store must be a string.');
   const slug = value.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/$/, '').replace(/\.myshopify\.com$/, '');

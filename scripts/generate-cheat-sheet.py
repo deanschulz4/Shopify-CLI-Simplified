@@ -16,7 +16,7 @@ OUTPUT = ROOT / "output" / "pdf" / "shopify-command-cheat-sheet.pdf"
 INTRO = [
     "Run commands from your theme folder. Select a store with <font face='Courier'>si &lt;store_abr&gt;</font>; then omit it. "
     "Replace <font face='Courier'>&lt;store_abr&gt;</font> with your alias. Quote theme names with spaces. Check the store with <font face='Courier'>si</font>.",
-    "A configured <font face='Courier'>defaultStore</font> overrides the remembered store. Personal config is created on install at <font face='Courier'>~/.sshop.json</font>.",
+    "A configured <font face='Courier'>defaultStore</font> overrides the remembered store. Personal config is created on first use at <font face='Courier'>~/.sshop.json</font>.",
 ]
 
 COMMANDS = [

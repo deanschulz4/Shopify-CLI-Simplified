@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildCommand, formatCommand } from '../src/commands.js';
 import { main } from '../src/cli.js';
-import { normalizeStore, loadConfig, writeConfig, validateConfig, importAliases } from '../src/config.js';
+import { normalizeStore, loadConfig, writeConfig, validateConfig, importAliases, ensureGlobalConfig } from '../src/config.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const config = { version: 1, stores: { demo: 'example-store', same: 'same' }, defaults: { nodelete: true, themeEditorSync: true } };
@@ -219,6 +219,15 @@ test('development shorthand supports pull and info, and store omission preserves
   assert.throws(() => build('sp', ['-d', '--development']), /only one/);
   assert.throws(() => build('si', ['-d', '-t', '123']), /either/);
   assert.throws(() => build('sd', ['-d']), /applies/);
+});
+
+test('ensureGlobalConfig creates personal config on first use', t => {
+  const home = temporary(t);
+  const file = path.join(home, '.sshop.json');
+  assert.equal(fs.existsSync(file), false);
+  ensureGlobalConfig({ home });
+  assert.equal(fs.existsSync(file), true);
+  assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')).stores, {});
 });
 
 test('stores mutations default to global configuration', t => {

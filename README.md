@@ -19,7 +19,7 @@ or enable [short commands](#shell-setup).
 
 ## 2. Store Abreviations Mapping
 
-Personal config is created automatically on install at `~/.sshop.json`.
+Personal config is created automatically on first use at `~/.sshop.json`.
 
 
 | Command                       | Description                     |
