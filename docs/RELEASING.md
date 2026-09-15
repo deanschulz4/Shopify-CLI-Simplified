@@ -1,3 +1,7 @@
+# Release 0.1.2
+
+README update
+
 # Release 0.1.1
 
 Documentation update: simpler setup instructions, shorter command descriptions,
