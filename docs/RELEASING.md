@@ -1,3 +1,9 @@
+# Release 0.1.3
+
+Store setup improvements: `sstores` defaults to global config, `sstores .` opens the
+personal config file, install creates `~/.sshop.json` automatically, and the
+cheat sheet PDF was regenerated.
+
 # Release 0.1.2
 
 README update

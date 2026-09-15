@@ -35,8 +35,8 @@ Example `~/.sshop.json`:
 {
   "version": 1,
   "stores": {
-    "sto": "store-example.myshopify.com",
-    "san": "sandbox-example.myshopify.com"
+    "sto": "example-store.myshopify.com",
+    "san": "example-sandbox.myshopify.com"
   },
   "defaultStore": "san",
   "defaults": {
