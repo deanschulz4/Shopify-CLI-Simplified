@@ -1,3 +1,7 @@
+# Release 0.1.4
+
+README fix: use `jsonc` for the config example so inline default comments preview correctly.
+
 # Release 0.1.3
 
 Store setup improvements: `sstores` defaults to global config, `sstores .` opens the

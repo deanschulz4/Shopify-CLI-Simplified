@@ -31,7 +31,7 @@ Personal config is created automatically on install at `~/.sshop.json`.
 
 Example `~/.sshop.json`:
 
-```json
+```jsonc
 {
   "version": 1,
   "stores": {
