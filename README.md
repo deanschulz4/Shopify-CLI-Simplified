@@ -91,131 +91,103 @@ Add `.sshop.json` to each theme project's `.gitignore` if it contains personal
 store mappings. This package excludes local configuration and legacy source
 from its distributable archive.
 
-## Select a store once, then omit the abbreviation
+## Shopify command cheat sheet
 
-Run `si <store_abr>` to select/check your store in Shopify CLI (complete login if
-prompted). After it succeeds, `<store_abr>` is optional on subsequent theme
-commands. Replace the placeholder, including its angle brackets, with an alias.
+### Rules
 
-```sh
-si demo
-sl
-sd "My Theme"
-sp "My Theme"
-sp -p
-sp -d
-si -d -j
-```
+- Run theme commands from your theme project folder.
+- Replace `<store_abr>` with your configured store abbreviation.
+- Select the current store once with `si <store_abr>`. After it succeeds, omit `<store_abr>` in commands such as `sl`, `sd "My Theme"`, `sp -p`, `sp -d`, and `si -j`.
+- Run `si` to check the current store; specify another abbreviation to switch.
+- Store aliases are still required when adding or removing aliases.
 
-Shopify remembers the selected store until another store is specified; this is
-not a permanent per-project binding. Use `si` to check the current target when
-switching projects. An explicit store or a configured `defaultStore` takes
-precedence over Shopify's remembered store. `si` does not change `defaultStore`;
-clear it or set it to the intended store if you want this remembered-store workflow.
-`si --dry-run` does not select a store. `sinit` creates our config file; it is not
-Shopify store initialization.
+### Flags
+
+- `-g` = `--global` for `sinit`, `sstores add/remove`, and `simport`.
+- `-d` = `--development` for `sp`, `spl`, `spa`, and `si`.
+- Both long and short forms work.
+
+### Important
+
+- A configured `defaultStore` overrides the remembered Shopify store. `si` does not change `defaultStore`; clear it or set it to the intended store.
+- The selected store is not permanently bound to your project.
+- `si --dry-run` does not select a store.
+- `sinit` creates configuration only.
 
 This follows Shopify's [connecting-to-a-store behavior](https://shopify.dev/docs/storefronts/themes/tools/cli#connecting-to-a-store).
 
-## Theme commands
+### Commands
 
-| Command | Shortcut | Behavior |
-| --- | --- | --- |
-| `sshop list [store]` | `sl` | Show the complete theme list |
-| `sshop info [store]` | `si` | Show theme environment information |
-| `sshop dev [store] [theme]` | `sd` | Develop with Theme Editor sync |
-| `sshop pull [store] [theme]` | `sp` | Pull with `--nodelete`; default to live theme |
-| `sshop pull-json [store] [theme]` | `spl` | Pull templates/config JSON with `--nodelete` |
-| `sshop pull-all [store] [theme]` | `spa` | Pull without `--nodelete` |
-| `sshop check` | `sc` | Run Theme Check |
-| `sshop fix` | `sf` | Auto-correct Theme Check findings |
-| `sshop logout` | `lo` | Run Shopify auth logout |
+| Command | What it does |
+| --- | --- |
+| `si <store_abr>` | Select the current Shopify store and show theme information; omit `<store_abr>` in later theme commands |
+| `sl` | List all themes |
+| `sd "Theme Name"` or `sd Theme_Name` | Start development on a named theme with editor sync |
+| `sd` | Start development using a Shopify development theme |
+| `sp "Theme Name"` or `sp theme_name` | Pull a named theme; preserve unmatched local files |
+| `sp` | Pull the live theme; preserve unmatched local files |
+| `sp -p` | Pull only live template/config JSON |
+| `spl "My Theme"` | Pull only template/config JSON from a named theme |
+| `spa` | Pull the live theme; may delete unmatched local files |
+| `sp -d` | Pull the development theme |
+| `sc` | Check theme code for issues |
+| `sf` | Automatically fix supported theme issues |
+| `lo` | Log out of Shopify |
 
-Short names also work directly: `sshop sd demo "My Theme"`.
+### Store aliases and setup
 
-```sh
-sshop dev sandbox "My Theme"
-sshop pull demo "My Theme" -p
-sshop pull demo -d
-sshop dev --store new-store --theme "Theme with spaces"
-sshop dev sandbox -p 9293
-sshop list demo -j
-sshop pull demo -p --dry-run
-```
+| Command | What it does |
+| --- | --- |
+| `sstores` | List available store aliases |
+| `sstores add <store_abr> example-store -g` | Add/update a personal store alias |
+| `sstores remove <store_abr> -g` | Remove a personal store alias |
+| `sconfig` | Show effective settings and config locations |
+| `sinit` | Create a project-specific config |
+| `sinit -g` | Create a personal config; refuses to overwrite |
+| `simport ./base_custom_cli.sh -g` | Import aliases from the original file |
+| `shelp` | Show command help |
 
-A single positional argument to `dev`/`pull` is a store if it matches a configured
+### Useful options
+
+| Example | What it does |
+| --- | --- |
+| `sd "My Theme" --dry-run` | Preview the command without running Shopify |
+| `sd -s <store_abr> -t "My Theme"` | Explicitly select store and theme |
+| `sd -p 9293` | Use a different development port |
+| `sl -j` | Return the theme list as JSON |
+| `sd --config "./custom.json"` | Use a specific configuration file |
+
+### Remember
+
+- Quotes are required for theme names containing spaces. Use straight quotes (`"`) when copying commands into your terminal.
+- Pull (`sp`) overwrites matching local files. Preserving unmatched files does not prevent existing files from being overwritten.
+- Dev (`sd`) uploads and continuously syncs changes to the selected remote theme.
+- `sd <store_abr> -p 9293` sets the development port; `sp <store_abr> -p` pulls only template/config JSON.
+- `si <store_abr> -j` returns theme information as JSON; `sl <store_abr> -j` returns the theme list as JSON.
+- `sf` modifies local files. Use `--dry-run` to inspect command targeting before running Shopify.
+
+### Argument handling and compatibility
+
+All commands above work without an `sshop` prefix. The prefixed equivalents
+remain supported, for example `sshop dev`, `sshop pull`, and `sshop sd`.
+
+A single positional argument to `sd`/`sp` is a store if it matches a configured
 alias or looks like a URL/domain; otherwise it is a theme. With two positional
 arguments, they mean store and theme. Use `--store` for an unmapped prefix with
-no theme; use `--theme` when a theme name matches an alias. Quote names with spaces.
-Without a theme, `dev` uses Shopify's development theme behavior.
+no theme; use `--theme` when a theme name matches an alias.
 
 Wrapper flags use separate values (`--store demo`, not `--store=demo`). Additional
-Shopify flags go after `--`. Targeting flags belong before `--` to avoid duplicate
-store/theme selection. Nodelete/editor-sync defaults are configured in the dotfile.
+Shopify flags go after `--`. Put targeting flags and `--dry-run` before `--`.
+The original `sd -- --port 9293` and `sl -- --json` forms remain supported;
+`--port` and `--json` also work directly. Nodelete/editor-sync defaults are
+configured in the dotfile.
 
-`--dry-run` prints the command without starting Shopify. It redacts password
+`--dry-run` prints the command without starting Shopify and redacts password
 values. Arguments are forwarded as an array, without `eval` or shell expansion.
 Normal commands inherit Shopify's interactive terminal and exit code.
+Shopify's live-theme protections remain in place.
 
-**Effects:** Pull overwrites matching local files; `--nodelete` only protects files
-absent remotely. `spa` can also remove unmatched local files. Dev uploads and
-continues syncing changes to the selected theme. Shopify's live-theme protections
-remain in place. `sf` modifies local files. Use `--dry-run` to inspect targeting.
-
-## Direct commands: no prefix required
-
-Install or reinstall the updated package from this project directory:
-
-```sh
-npm install -g .
-sd demo "My Theme" --dry-run
-sp demo -p --dry-run
-sl demo
-```
-
-| Command | Purpose |
-| --- | --- |
-| `sd demo "My Theme"` | Start development with editor sync |
-| `sp demo "My Theme"` | Pull theme files, preserving unmatched local files |
-| `spl demo` | Pull live template/config JSON |
-| `spa demo` | Pull live theme without preserving unmatched local files |
-| `sl demo` | List themes |
-| `si demo` | Show theme information |
-| `sc` | Check theme code |
-| `sf` | Auto-correct theme issues |
-| `lo` | Log out of Shopify |
-| `sinit --global` | Create personal config |
-| `sstores add demo example-store --global` | Add/update a store alias |
-| `sstores` | List store aliases |
-| `sconfig` | Show effective config |
-| `simport ./base_custom_cli.sh --global` | Import original store aliases |
-| `shelp` | Show help |
-
-All direct theme commands accept the same options as their prefixed equivalents.
-For a specific config, put it first: `sd --config "./custom.json" demo --dry-run`.
-The earlier `sshop …` examples remain supported.
-
-Use `sd <store_abr> -p 9293` (or `--port 9293`) to set the development port.
-For pull commands, `-p` still means JSON-only: `sp <store_abr> -p`.
-The longer `sd <store_abr> -- --port 9293` form also remains supported.
-
-Use `sl <store_abr> -j` or `si <store_abr> -j` for JSON output. `--json` is also
-accepted directly; the original `-- --json` form remains supported. This controls
-output formatting, whereas `sp <store_abr> -p` selects which files to pull.
-
-### Short flags
-
-| Short flag | Long flag | Applies to | Example |
-| --- | --- | --- | --- |
-| `-g` | `--global` | `sinit`, `sstores add/remove`, `simport` | `sstores add demo example-store -g` |
-| `-d` | `--development` | `sp`, `spl`, `spa`, `si` | `sp -d` or `si -d -j` |
-| `-p PORT` | `--port PORT` | `sd` | `sd -p 9293` |
-| `-p` | `--json-only` | Pull commands | `sp -p` |
-| `-j` | `--json` | `sl`, `si` | `sl -j` |
-
-Long flags remain supported. Put these flags before the `--` passthrough separator.
-Store abbreviations are required for alias creation/removal, even when a Shopify
-store is already selected.
+## Shell setup
 
 ### macOS / Bash / Zsh
 
